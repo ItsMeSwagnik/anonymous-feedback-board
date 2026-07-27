@@ -58,7 +58,7 @@ jspm_packages/
 *.sln
 
 # Compact
-managed/
+# managed/ - intentionally tracked for Vercel deployment
 
 .claude
 .midnight-expert
