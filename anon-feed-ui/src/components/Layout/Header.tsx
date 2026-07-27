@@ -40,26 +40,12 @@ export const Header: React.FC = () => {
           }
         }
       } catch (error) {
-        console.log('Wallet not connected:', error);
+        // Silently fail - wallet not connected yet
+        console.log('Wallet not connected');
       }
     };
 
     checkWallet();
-    
-    // Listen for account changes
-    // @ts-ignore
-    if (window.midnight) {
-      // @ts-ignore
-      window.midnight.on('accountChanged', (account: string) => {
-        if (account) {
-          setWalletConnected(true);
-          setWalletAddress(`${account.slice(0, 6)}...${account.slice(-4)}`);
-        } else {
-          setWalletConnected(false);
-          setWalletAddress('');
-        }
-      });
-    }
   }, []);
 
   const handleConnectWallet = async () => {
