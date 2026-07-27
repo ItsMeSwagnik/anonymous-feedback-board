@@ -82,7 +82,14 @@ export const Header: React.FC = () => {
       console.error('Wallet connection error:', err);
       let errorMsg = 'Failed to connect wallet.\n\n';
       
-      if (err.message?.includes('User rejected') || err.message?.includes('rejected by user')) {
+      if (err.message?.includes('sync') || err.message?.includes('Sync')) {
+        errorMsg = '⏳ Wallet is syncing...\n\n' +
+          'Please:\n' +
+          '1. Open your 1AM/Lace wallet\n' +
+          '2. Wait for sync to complete\n' +
+          '3. Try connecting again\n\n' +
+          'This is normal for first-time connections.';
+      } else if (err.message?.includes('User rejected') || err.message?.includes('rejected by user')) {
         errorMsg = 'Connection rejected. Please try again.';
       } else if (err.message?.includes('No Midnight wallet')) {
         errorMsg = 'No wallet extension found.\n\nPlease install:\n• Lace: https://www.lace.io/\n• 1AM: https://1amwallet.com/';
