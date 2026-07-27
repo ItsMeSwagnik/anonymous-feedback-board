@@ -17,7 +17,6 @@ import React, { useState, useEffect } from 'react';
 import { AppBar, Box, Typography, Button, Chip } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { ConnectedAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { setNetworkId, NetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 
 /**
@@ -27,7 +26,6 @@ export const Header: React.FC = () => {
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [isConnecting, setIsConnecting] = useState(false);
-  const [error, setError] = useState<string>('');
 
   // Set network ID on mount
   useEffect(() => {
@@ -37,43 +35,40 @@ export const Header: React.FC = () => {
 
   const handleConnectWallet = async () => {
     setIsConnecting(true);
-    setError('');
     
     try {
       // Check if wallet extension is available
-      // @ts-ignore - midnight connector API
+      // @ts-ignore - midnight wallet API
       if (!window.midnight) {
         throw new Error('No Midnight wallet extension found. Please install Lace or 1AM wallet.');
       }
 
-      // Connect using the Midnight dApp connector API
-      const networkId = import.meta.env.VITE_NETWORK_ID as NetworkId;
-      const connectedAPI = await ConnectedAPI.connect(networkId);
-      
-      // Get the connected account
-      const accounts = await connectedAPI.getShieldedAddresses();
+      // Request wallet connection using the standard Midnight wallet API
+      // @ts-ignore
+      const accounts = await window.midnight.request({ 
+        method: 'getAccounts'
+      });
       
       if (accounts && accounts.length > 0) {
         setWalletConnected(true);
         setWalletAddress(`${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`);
       } else {
-        throw new Error('No accounts found in wallet');
+        throw new Error('No accounts found in wallet. Please unlock your wallet.');
       }
     } catch (err: any) {
       console.error('Wallet connection error:', err);
       let errorMsg = 'Failed to connect wallet.\n\n';
       
-      if (err.message?.includes('User rejected')) {
+      if (err.message?.includes('User rejected') || err.message?.includes('rejected by user')) {
         errorMsg = 'Connection rejected. Please try again.';
       } else if (err.message?.includes('No Midnight wallet')) {
         errorMsg = 'No wallet extension found.\n\nPlease install:\n• Lace: https://www.lace.io/\n• 1AM: https://1amwallet.com/';
       } else if (err.message?.includes('Network ID')) {
-        errorMsg = 'Network not configured.\n\nPlease ensure:\n• Proof server is running\n• Midnight Preprod is configured';
+        errorMsg = 'Network not configured.\n\nPlease ensure:\n• Proof server is running (http://localhost:6300)\n• Midnight Preprod is configured in wallet';
       } else {
         errorMsg += err.message || 'Unknown error';
       }
       
-      setError(errorMsg);
       alert(errorMsg);
     } finally {
       setIsConnecting(false);
