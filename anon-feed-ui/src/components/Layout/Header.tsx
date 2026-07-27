@@ -13,45 +13,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect } from 'react';
-import { AppBar, Box, Typography, Chip } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import WarningIcon from '@mui/icons-material/Warning';
+import React from 'react';
+import { AppBar, Box, Typography, Button } from '@mui/material';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 /**
  * A simple application level header for the bulletin board application.
+ * 
+ * Note: Wallet connection is handled by the Board component through Midnight.js
+ * infrastructure. Users connect their wallet when creating or joining a board.
  */
 export const Header: React.FC = () => {
-  const [walletDetected, setWalletDetected] = useState(false);
-  const [walletName, setWalletName] = useState<string>('');
-
-  useEffect(() => {
-    // Detect if any Midnight wallet extension is installed
-    const detectWallet = async () => {
-      try {
-        // @ts-ignore - midnight connector API
-        if (window.midnight && window.midnight.providers) {
-          // @ts-ignore
-          const providers = window.midnight.providers;
-          if (providers && providers.length > 0) {
-            setWalletDetected(true);
-            // Get the first available wallet name
-            const firstWallet = providers[0];
-            setWalletName(firstWallet.name || 'Wallet');
-          }
-        } else if (window.midnight) {
-          // Fallback for older API
-          setWalletDetected(true);
-          setWalletName('Wallet');
-        }
-      } catch (error) {
-        console.log('Wallet detection failed:', error);
-        setWalletDetected(false);
-      }
-    };
-
-    detectWallet();
-  }, []);
+  const handleConnectWallet = () => {
+    // Wallet connection is triggered through the Board component
+    // This button serves as a visual indicator and help prompt
+    alert(
+      'Wallet Connection\n\n' +
+      'To connect your wallet:\n\n' +
+      '1. Click "Create a new Board" or "Join an existing one"\n' +
+      '2. Your wallet extension will automatically prompt for connection\n' +
+      '3. Approve the connection in your wallet\n\n' +
+      'Supported wallets: Lace, 1AM, and other Midnight-compatible wallets\n\n' +
+      'Make sure:\n' +
+      '• Wallet extension is installed\n' +
+      '• Proof server is running (http://localhost:6300)\n' +
+      '• Midnight Preprod network is configured'
+    );
+  };
 
   return (
     <AppBar
@@ -79,28 +67,26 @@ export const Header: React.FC = () => {
         </Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        {walletDetected ? (
-          <Chip
-            icon={<CheckCircleIcon />}
-            label={`${walletName} Detected`}
-            sx={{ 
-              bgcolor: 'rgba(76, 175, 80, 0.2)',
-              color: '#4CAF50',
-              fontWeight: 'bold',
-            }}
-          />
-        ) : (
-          <Chip
-            icon={<WarningIcon />}
-            label="No Wallet Detected"
-            sx={{ 
-              bgcolor: 'rgba(255, 152, 0, 0.2)',
-              color: '#FF9800',
-              fontWeight: 'bold',
-            }}
-          />
-        )}
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Button
+          variant="outlined"
+          onClick={handleConnectWallet}
+          startIcon={<AccountBalanceWalletIcon />}
+          sx={{
+            color: '#00C9FF',
+            borderColor: '#00C9FF',
+            fontWeight: 'bold',
+            px: 2,
+            py: 0.8,
+            '&:hover': {
+              borderColor: '#92FE9D',
+              color: '#92FE9D',
+              backgroundColor: 'rgba(0, 201, 255, 0.1)',
+            },
+          }}
+        >
+          Connect Wallet
+        </Button>
       </Box>
     </AppBar>
   );
