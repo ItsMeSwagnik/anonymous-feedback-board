@@ -7,9 +7,18 @@ A privacy-preserving feedback board built on the [Midnight Network](https://midn
 
 ## 🚀 Live Demo
 
-**Vercel Deployment:** [Live Demo Link](https://anon-feed.vercel.app)
+**Vercel Deployment:** [Deploy to Vercel](https://vercel.com/new) 
 
-> **Note:** Replace the above link with your actual Vercel deployment URL after deploying.
+**Live URL:** `https://anonymous-feedback-board.vercel.app` *(after deployment)*
+
+> **📋 Deployment Guide:** See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for detailed deployment instructions.
+
+> **⚡ Quick Deploy:**
+> ```bash
+> npm install -g vercel
+> vercel login
+> vercel --prod
+> ```
 
 ## Contract Address
 
