@@ -20,11 +20,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { setNetworkId, NetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import semver from 'semver';
 
-// Type for the wallet API
+// Type for the wallet API (matches Midnight's InitialAPI)
 interface WalletAPI {
   apiVersion: string;
-  rdns?: string;
-  name?: string;
+  rdns: string;
+  name: string;
   icon?: string;
   connect: (networkId: string) => Promise<any>;
 }
