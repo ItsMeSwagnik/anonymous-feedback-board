@@ -1,7 +1,7 @@
 {
-  "include": ["src/**/*.ts", "src/test/jest.setup.ts"],
+  "include": ["src/**/*.ts", "src/test/jest.setup.ts", "../contract/src/**/*.ts"],
   "compilerOptions": {
-    // "rootDir": "src",
+    "rootDir": "..",
     "outDir": "dist",
     "declaration": true,
     "lib": ["ESNext", "DOM"],
