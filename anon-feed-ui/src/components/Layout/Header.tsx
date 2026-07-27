@@ -14,7 +14,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { AppBar, Box } from '@mui/material';
+import { AppBar, Box, Typography } from '@mui/material';
 
 /**
  * A simple application level header for the bulletin board application.
@@ -28,18 +28,24 @@ export const Header: React.FC = () => (
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      px: 3,
     }}
   >
     <Box
       sx={{
         display: 'flex',
-        px: 10,
-        py: 2.2,
         alignItems: 'center',
       }}
       data-testid="header-logo"
     >
-      <img src="/midnight-logo.png" alt="logo-image" height={66} />
+      <img src="/midnight-logo.png" alt="Midnight logo" height={50} style={{ marginRight: 16 }} />
+      <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', color: '#fff' }}>
+        Anonymous Feedback Board
+      </Typography>
+    </Box>
+
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      {/* Wallet connection is handled by the Board component via Midnight.js */}
     </Box>
   </AppBar>
 );
