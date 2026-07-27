@@ -87,11 +87,13 @@ export const Header: React.FC = () => {
       
       if (err.message?.includes('sync') || err.message?.includes('Sync')) {
         errorMsg = '⏳ Wallet is syncing...\n\n' +
+          'This can take 1-2 minutes on first connection.\n\n' +
           'Please:\n' +
-          '1. Open your 1AM/Lace wallet\n' +
-          '2. Wait for sync to complete\n' +
-          '3. Try connecting again\n\n' +
-          'This is normal for first-time connections.';
+          '1. Open your 1AM/Lace wallet extension\n' +
+          '2. Wait for it to fully sync (check the extension icon)\n' +
+          '3. Make sure you\'re on Midnight Preprod network\n' +
+          '4. Try connecting again\n\n' +
+          '💡 Tip: Refresh the page if it\'s been syncing for >2 minutes';
       } else if (err.message?.includes('User rejected') || err.message?.includes('rejected by user')) {
         errorMsg = 'Connection rejected. Please try again.';
       } else if (err.message?.includes('No Midnight wallet')) {
