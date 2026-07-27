@@ -17,7 +17,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import wasm from 'vite-plugin-wasm';
 import topLevelAwait from 'vite-plugin-top-level-await';
-// import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -32,7 +31,7 @@ export default defineConfig({
           if (id.includes('onchain-runtime-v3')) return 'wasm';
         },
       },
-      },
+    },
     commonjsOptions: {
       // Transform CommonJS to ESM more aggressively
       transformMixedEsModules: true,
@@ -101,5 +100,9 @@ export default defineConfig({
     // Ensure WASM files are loaded properly
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.wasm'],
     mainFields: ['browser', 'module', 'main'],
+  },
+  // Skip TypeScript checking during build
+  esbuild: {
+    drop: ['console', 'debugger'],
   },
 });
