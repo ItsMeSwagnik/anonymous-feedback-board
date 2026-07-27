@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AnonFeedSimulator } from "./anon-feed-simulator.js";
+import { AnonFeedSimulator } from "./bboard-simulator.js";
 import { setNetworkId } from "@midnight-ntwrk/midnight-js-network-id";
 import { describe, it, expect } from "vitest";
 import { randomBytes } from "./utils.js";
