@@ -237,6 +237,44 @@ Access at: http://127.0.0.1:8080
 
 ## Troubleshooting
 
+### Wallet Connection Errors
+
+If you see errors like:
+```
+Midnight Lace wallet has failed to respond. Extension enabled?
+Wallet connector API has failed to respond
+```
+
+This is **expected** if you haven't set up the Midnight wallet infrastructure yet.
+
+**Solution:**
+
+1. **Install Lace Wallet Extension**
+   - Chrome: https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiendhlofajokpaflmk
+   - Edge: https://microsoftedge.microsoft.com/addons/detail/lace/efeiemlfnahiidnjglmehaihacglceia
+
+2. **Configure for Midnight Network**
+   ```
+   1. Open Lace wallet
+   2. Settings → Networks
+   3. Add "Midnight Preprod" network
+   4. Set proof server: http://localhost:6300
+   5. Connect to Preprod network
+   ```
+
+3. **Start the Proof Server**
+   ```bash
+   cd anon-feed-cli
+   docker compose -f proof-server-local.yml up -d
+   ```
+
+4. **Get Test Tokens**
+   - Visit [Preprod Faucet](https://midnight-tmnight-preprod.nethermind.dev/)
+   - Request tNIGHT tokens
+   - Wait 2-3 minutes for confirmation
+
+### Common Issues
+
 | Issue | Solution |
 |-------|----------|
 | Contract compilation fails | Ensure Docker is running and you have access to ghcr.io |
@@ -244,6 +282,7 @@ Access at: http://127.0.0.1:8080
 | Wallet not connecting | Install Lace wallet, configure Midnight Preprod network |
 | No funds in wallet | Request tNIGHT from [Preprod Faucet](https://midnight-tmnight-preprod.nethermind.dev/) |
 | Vercel deployment fails | Check vercel.json configuration and build logs |
+| `titleTypographyProps` warning | Minor MUI prop naming - doesn't affect functionality |
 
 ## Resources
 
