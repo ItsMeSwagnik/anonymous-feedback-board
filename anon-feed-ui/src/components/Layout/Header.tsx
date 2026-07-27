@@ -23,6 +23,9 @@ import semver from 'semver';
 // Type for the wallet API
 interface WalletAPI {
   apiVersion: string;
+  rdns?: string;
+  name?: string;
+  icon?: string;
   connect: (networkId: string) => Promise<any>;
 }
 
