@@ -9,7 +9,7 @@ A privacy-preserving feedback board built on the [Midnight Network](https://midn
 
 **Vercel Deployment:** [Deploy to Vercel](https://vercel.com/new) 
 
-**Live URL:** `https://anonymous-feedback-board.vercel.app` *(after deployment)*
+**Live URL:** `https://anonymous-feedback-board.vercel.app/` *(after deployment)*
 
 > **📋 Deployment Guide:** See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for detailed deployment instructions.
 
