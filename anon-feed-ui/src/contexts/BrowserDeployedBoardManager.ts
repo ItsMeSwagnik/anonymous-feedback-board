@@ -218,7 +218,7 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
 
 /** @internal */
 const initializeProviders = async (logger: Logger): Promise<AnonFeedProviders> => {
-  const networkId = import.meta.env.VITE_NETWORK_ID as NetworkId;
+  const networkId = (import.meta.env.VITE_NETWORK_ID ?? 'preprod') as NetworkId;
   const connectedAPI = await connectToWallet(logger, networkId);
   const zkConfigPath = window.location.origin; // '../../../contract/src/managed/anon-feed';
   const keyMaterialProvider = new FetchZkConfigProvider<AnonFeedCircuitKeys>(zkConfigPath, fetch.bind(window));
@@ -228,7 +228,10 @@ const initializeProviders = async (logger: Logger): Promise<AnonFeedProviders> =
   return {
     privateStateProvider: inMemoryAnonFeedPrivateStateProvider,
     zkConfigProvider: keyMaterialProvider,
-    proofProvider: httpClientProofProvider(config.proverServerUri!, keyMaterialProvider),
+    proofProvider: httpClientProofProvider(
+      config.proverServerUri ?? import.meta.env.VITE_PROOF_SERVER ?? 'http://localhost:6300',
+      keyMaterialProvider,
+    ),
     publicDataProvider: indexerPublicDataProvider(config.indexerUri, config.indexerWsUri),
     walletProvider: {
       getCoinPublicKey(): string {
@@ -267,15 +270,30 @@ const initializeProviders = async (logger: Logger): Promise<AnonFeedProviders> =
 };
 
 /** @internal */
-const getFirstCompatibleWallet = (): InitialAPI | undefined => {
-  if (!window.midnight) return undefined;
-  return Object.values(window.midnight).find(
+const getCompatibleWallets = (): InitialAPI[] => {
+  if (!window.midnight) return [];
+  return Object.values(window.midnight).filter(
     (wallet): wallet is InitialAPI =>
       !!wallet &&
       typeof wallet === 'object' &&
       'apiVersion' in wallet &&
       semver.satisfies(wallet.apiVersion, COMPATIBLE_CONNECTOR_API_VERSION),
   );
+};
+
+/** Prefer Lace (mnLace) if present, otherwise use first compatible wallet */
+const getPreferredWallet = (): InitialAPI | undefined => {
+  if (!window.midnight) return undefined;
+  const lace = (window.midnight as Record<string, unknown>)['mnLace'];
+  if (
+    lace &&
+    typeof lace === 'object' &&
+    'apiVersion' in lace &&
+    semver.satisfies((lace as InitialAPI).apiVersion, COMPATIBLE_CONNECTOR_API_VERSION)
+  ) {
+    return lace as InitialAPI;
+  }
+  return getCompatibleWallets()[0];
 };
 
 const COMPATIBLE_CONNECTOR_API_VERSION = '4.x';
@@ -285,47 +303,77 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
   return firstValueFrom(
     fnPipe(
       interval(100),
-      map(() => getFirstCompatibleWallet()),
+      map(() => getPreferredWallet()),
       tap((connectorAPI) => {
-        logger.info(connectorAPI, 'Check for wallet connector API');
+        if (connectorAPI) logger.info({ name: connectorAPI.name, rdns: connectorAPI.rdns }, 'Check for wallet connector API');
       }),
       filter((connectorAPI): connectorAPI is InitialAPI => !!connectorAPI),
       tap((connectorAPI) => {
-        logger.info(connectorAPI, 'Compatible wallet connector API found. Connecting.');
+        logger.info({ name: connectorAPI.name, rdns: connectorAPI.rdns }, 'Compatible wallet connector API found. Connecting.');
       }),
       take(1),
       timeout({
-        first: 1_000,
+        first: 10_000,
         with: () =>
           throwError(() => {
+            const found = getCompatibleWallets();
+            const names = found.map((w) => w.name).join(', ');
             logger.error('Could not find wallet connector API');
-
-            return new Error('Could not find Midnight Lace wallet. Extension installed?');
+            return new Error(
+              found.length > 0
+                ? `Found wallet(s) [${names}] but none on Midnight Preprod. Open your wallet → Settings → Networks and enable Midnight Preprod.`
+                : 'No Midnight wallet found. Install Lace (lace.io/midnight) or 1AM (1am.xyz) and enable Midnight Preprod network.',
+            );
           }),
       }),
       concatMap(async (initialAPI) => {
-        const connectedAPI = await initialAPI.connect(networkId);
-        const connectionStatus = await connectedAPI.getConnectionStatus();
-        logger.info(connectionStatus, 'Wallet connector API enabled status');
-        return connectedAPI;
+        // Retry connect up to 30s to allow Lace wallet to finish syncing
+        const deadline = Date.now() + 30_000;
+        let lastError: unknown;
+        while (Date.now() < deadline) {
+          try {
+            const connectedAPI = await initialAPI.connect(networkId);
+            const connectionStatus = await connectedAPI.getConnectionStatus();
+            logger.info(connectionStatus, 'Wallet connection status');
+            // Hard-fail on disconnected or network mismatch — do NOT retry
+            if (connectionStatus.status === 'disconnected') {
+              throw new Error(
+                `Wallet "${initialAPI.name}" reported status "disconnected". Open the wallet and try again.`,
+              );
+            }
+            // status === 'connected': networkId is present on this branch per ConnectionStatus type
+            if (connectionStatus.networkId !== networkId) {
+              const walletNet = connectionStatus.networkId ?? 'an unknown network';
+              throw new Error(
+                `Wallet "${initialAPI.name}" is on network "${walletNet}" but this app requires "${networkId}". ` +
+                  `Open ${initialAPI.name} → Settings → Networks and switch to Midnight Preprod.`,
+              );
+            }
+            return connectedAPI;
+          } catch (e: unknown) {
+            lastError = e;
+            const msg = e instanceof Error ? e.message : String(e);
+            // Only retry on sync errors — rethrow everything else immediately
+            if (msg.toLowerCase().includes('sync') || msg.toLowerCase().includes('not ready')) {
+              logger.info('Wallet syncing — retrying in 2s...');
+              await new Promise((r) => setTimeout(r, 2_000));
+            } else {
+              throw e;
+            }
+          }
+        }
+        throw lastError ?? new Error('Wallet failed to sync within 30 seconds. Open the wallet and wait for sync to finish.');
       }),
       timeout({
-        first: 5_000,
+        first: 45_000,
         with: () =>
           throwError(() => {
             logger.error('Wallet connector API has failed to respond');
-
-            return new Error('Midnight Lace wallet has failed to respond. Extension enabled?');
+            return new Error('Wallet is taking too long to respond. Open the extension and wait for it to finish syncing.');
           }),
       }),
-      catchError((error, apis) =>
-        error
-          ? throwError(() => {
-              logger.error('Unable to enable connector API' + error);
-              return new Error('Application is not authorized');
-            })
-          : apis,
-      ),
+      // Pass errors through as-is — do NOT wrap in a generic message
+      catchError((error) => throwError(() => (error instanceof Error ? error : new Error(String(error))))),
     ),
   );
 };
