@@ -2,8 +2,6 @@
 
 <img width="1917" height="1027" alt="image" src="https://github.com/user-attachments/assets/197fd710-7397-4505-b48a-98ebac233b75" />
 
-<img width="1917" height="1022" alt="image" src="https://github.com/user-attachments/assets/83a274a6-ca1c-40aa-abb8-2776cf6635f6" />
-
 A privacy-preserving feedback board built on the [Midnight Network](https://midnight.network/) where users can post anonymous messages that only they can remove — proven by zero-knowledge proofs.
 
 [![Compact Compiler](https://img.shields.io/badge/Compact%20Compiler-0.31.0-1abc9c.svg)](https://shields.io/)
