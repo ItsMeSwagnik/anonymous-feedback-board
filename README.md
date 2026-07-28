@@ -349,7 +349,7 @@ npm run dev
 ---
 
 ## Live Demo Link (Vercel):
-https://anonymous-feedback-board-95lg.vercel.app/
+https://anonymous-feedback-board.vercel.app/
 
 ## Google Drive Demo Link:
 https://drive.google.com/file/d/1GIR1S8MqbnT7zgzl-htBji1s24H7cqN5/view?usp=sharing
