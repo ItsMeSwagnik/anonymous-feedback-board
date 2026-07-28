@@ -53,12 +53,12 @@ jobs:
         run: |
           npm run ci
 
-      - name: Compile bboard-cli
-        working-directory: bboard-cli
+      - name: Compile anon-feed-cli
+        working-directory: anon-feed-cli
         run: |
           npm run ci
 
-      - name: Compile bboard-ui
-        working-directory: bboard-ui
+      - name: Compile anon-feed-ui
+        working-directory: anon-feed-ui
         run: |
           npm run ci
