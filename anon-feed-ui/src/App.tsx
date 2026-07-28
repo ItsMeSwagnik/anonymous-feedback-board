@@ -42,7 +42,7 @@ const App: React.FC = () => {
   }, [boardApiProvider]);
 
   return (
-    <Box sx={{ background: '#000', minHeight: '100vh' }}>
+    <Box sx={{ background: 'transparent', minHeight: '100vh' }}>
       <MainLayout>
         {boardDeployments.map((boardDeployment, idx) => (
           <div data-testid={`board-${idx}`} key={`board-${idx}`}>

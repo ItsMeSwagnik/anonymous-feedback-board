@@ -15,29 +15,16 @@
 
 import React, { useState } from 'react';
 import { type ContractAddress } from '@midnight-ntwrk/midnight-js-protocol/compact-runtime';
-import { CardActions, CardContent, IconButton, Tooltip, Typography } from '@mui/material';
-import BoardAddIcon from '@mui/icons-material/PostAddOutlined';
-import CreateBoardIcon from '@mui/icons-material/AddCircleOutlined';
-import JoinBoardIcon from '@mui/icons-material/AddLinkOutlined';
+import { Box, Button, CardContent, Typography, alpha } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
+import AddLinkIcon from '@mui/icons-material/AddLinkOutlined';
 import { TextPromptDialog } from './TextPromptDialog';
 
-/**
- * The props required by the {@link EmptyCardContent} component.
- *
- * @internal
- */
 export interface EmptyCardContentProps {
-  /** A callback that will be called to create a new bulletin board. */
   onCreateBoardCallback: () => void;
-  /** A callback that will be called to join an existing bulletin board. */
   onJoinBoardCallback: (contractAddress: ContractAddress) => void;
 }
 
-/**
- * Used when there is no board deployment to render a UI allowing the user to join or deploy bulletin boards.
- *
- * @internal
- */
 export const EmptyCardContent: React.FC<Readonly<EmptyCardContentProps>> = ({
   onCreateBoardCallback,
   onJoinBoardCallback,
@@ -46,37 +33,71 @@ export const EmptyCardContent: React.FC<Readonly<EmptyCardContentProps>> = ({
 
   return (
     <React.Fragment>
-      <CardContent>
-        <Typography align="center" variant="h1" color="primary.dark">
-          <BoardAddIcon fontSize="large" />
-        </Typography>
-        <Typography data-testid="board-posted-message" align="center" variant="body2" color="primary.dark">
-          Create a new Board, or join an existing one...
-        </Typography>
-      </CardContent>
-      <CardActions disableSpacing sx={{ justifyContent: 'center' }}>
-        <Tooltip title="Create a new board">
-          <IconButton data-testid="board-deploy-btn" onClick={onCreateBoardCallback}>
-            <CreateBoardIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Join an existing board">
-          <IconButton
-            data-testid="board-join-btn"
-            onClick={() => {
-              setTextPromptOpen(true);
+      <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ textAlign: 'center', py: 2 }}>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, rgba(0,201,255,0.15), rgba(146,254,157,0.15))',
+              border: '1px solid rgba(0,201,255,0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mx: 'auto',
+              mb: 2,
             }}
           >
-            <JoinBoardIcon />
-          </IconButton>
-        </Tooltip>
-      </CardActions>
+            <AddCircleOutlineIcon sx={{ color: '#00C9FF', fontSize: 24 }} />
+          </Box>
+          <Typography variant="h6" sx={{ color: '#fff', fontWeight: 600, mb: 0.5, fontSize: '1rem' }}>
+            Start a Board
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+            Deploy a new anonymous feedback board or join an existing one using its contract address.
+          </Typography>
+        </Box>
+
+        <Button
+          data-testid="board-deploy-btn"
+          variant="contained"
+          fullWidth
+          startIcon={<AddCircleOutlineIcon />}
+          onClick={onCreateBoardCallback}
+          sx={{
+            background: 'linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%)',
+            color: '#000',
+            fontWeight: 700,
+            py: 1.2,
+            '&:hover': { background: 'linear-gradient(90deg, #00b8e8 0%, #7de888 100%)' },
+          }}
+        >
+          Deploy New Board
+        </Button>
+
+        <Button
+          data-testid="board-join-btn"
+          variant="outlined"
+          fullWidth
+          startIcon={<AddLinkIcon />}
+          onClick={() => setTextPromptOpen(true)}
+          sx={{
+            borderColor: 'rgba(0,201,255,0.3)',
+            color: '#00C9FF',
+            fontWeight: 600,
+            py: 1.2,
+            '&:hover': { borderColor: '#00C9FF', bgcolor: alpha('#00C9FF', 0.06) },
+          }}
+        >
+          Join Existing Board
+        </Button>
+      </CardContent>
+
       <TextPromptDialog
         prompt="Enter contract address"
         isOpen={textPromptOpen}
-        onCancel={() => {
-          setTextPromptOpen(false);
-        }}
+        onCancel={() => setTextPromptOpen(false)}
         onSubmit={(text) => {
           setTextPromptOpen(false);
           onJoinBoardCallback(text);
