@@ -394,4 +394,4 @@ Apache-2.0
 
 ---
 
-**Built for the Midnight Builder Challenge — Rise In Level 1** 🌙
+**Built for the Midnight Builder Challenge — Rise In** 🌙
