@@ -2,6 +2,8 @@
 
 <img width="1917" height="1027" alt="image" src="https://github.com/user-attachments/assets/197fd710-7397-4505-b48a-98ebac233b75" />
 
+<img width="1919" height="1025" alt="image" src="https://github.com/user-attachments/assets/518204c7-cf60-4476-92b2-65d8dd536de0" />
+
 A privacy-preserving feedback board built on the [Midnight Network](https://midnight.network/) where users can post anonymous messages that only they can remove — proven by zero-knowledge proofs.
 
 [![Compact Compiler](https://img.shields.io/badge/Compact%20Compiler-0.31.0-1abc9c.svg)](https://shields.io/)
@@ -328,33 +330,15 @@ npm run dev
 
 ---
 
-## Screenshots
-
-### Main Interface
-![Main Interface](./screenshots/ui-main.png)
-
-### Posting a Message
-![Post Message](./screenshots/ui-post.png)
-
-### Wallet Connection
-![Wallet Connection](./screenshots/ui-wallet.png)
-
-### Message View
-![View Message](./screenshots/ui-view.png)
-
-> Add screenshots to the `screenshots/` folder after running the application.
-
----
-
 ## Live Demo Link (Vercel):
 https://anonymous-feedback-board.vercel.app/
 
 ## Google Drive Demo Link:
-https://drive.google.com/file/d/1GIR1S8MqbnT7zgzl-htBji1s24H7cqN5/view?usp=sharing
+https://drive.google.com/file/d/1ZGCeUXgfycM9hKYQ8ZqjV0QDqpULZB1W/view?usp=sharing
 
 ## Initial Idea
 
-> _Fill in your initial idea and motivation here before submitting on Rise In._
+> _The Anonymous Feedback Board lets anyone post a single message to a shared public board. The message author is identified only by a cryptographic key they keep secret._
 
 ---
 
