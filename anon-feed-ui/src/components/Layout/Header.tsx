@@ -5,9 +5,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 import SyncIcon from '@mui/icons-material/Sync';
 import { useWallet } from '../../contexts/WalletContext';
+import { WalletPickerDialog } from '../WalletPickerDialog';
 
 export const Header: React.FC = () => {
-  const { status, address, walletName, error, connect, disconnect } = useWallet();
+  const { status, address, walletName, error, availableWallets, connect, selectWallet, disconnect } = useWallet();
 
   const walletButton = () => {
     if (status === 'connected') {
@@ -47,7 +48,7 @@ export const Header: React.FC = () => {
       );
     }
 
-    if (status === 'connecting') {
+    if (status === 'connecting' || status === 'picking') {
       return (
         <Button
           variant="contained"
@@ -55,7 +56,7 @@ export const Header: React.FC = () => {
           startIcon={<CircularProgress size={14} sx={{ color: '#000' }} />}
           sx={{ background: '#333', color: '#666', fontWeight: 700, px: 2.5, py: 0.8, fontSize: '0.85rem' }}
         >
-          Connecting…
+          {status === 'picking' ? 'Select wallet…' : 'Connecting…'}
         </Button>
       );
     }
@@ -105,41 +106,54 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <AppBar
-      position="static"
-      data-testid="header"
-      elevation={0}
-      sx={{
-        background: 'rgba(10, 10, 15, 0.95)',
-        borderBottom: '1px solid rgba(0, 201, 255, 0.15)',
-        backdropFilter: 'blur(20px)',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        px: 4,
-        py: 1.5,
-      }}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }} data-testid="header-logo">
-        <img src="/midnight-logo.png" alt="Midnight logo" height={36} />
-        <Box sx={{ width: '1px', height: 28, bgcolor: 'rgba(0,201,255,0.3)' }} />
-        <Typography variant="h6" sx={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>
-          Anonymous Feedback Board
-        </Typography>
-        <Chip
-          label="Preprod"
-          size="small"
-          sx={{
-            bgcolor: alpha('#00C9FF', 0.1),
-            color: '#00C9FF',
-            border: '1px solid rgba(0,201,255,0.3)',
-            fontSize: '0.65rem',
-            height: 20,
-          }}
-        />
-      </Box>
+    <>
+      <AppBar
+        position="static"
+        data-testid="header"
+        elevation={0}
+        sx={{
+          background: 'rgba(10, 10, 15, 0.95)',
+          borderBottom: '1px solid rgba(0, 201, 255, 0.15)',
+          backdropFilter: 'blur(20px)',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 4,
+          py: 1.5,
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }} data-testid="header-logo">
+          <img src="/midnight-logo.png" alt="Midnight logo" height={36} />
+          <Box sx={{ width: '1px', height: 28, bgcolor: 'rgba(0,201,255,0.3)' }} />
+          <Typography variant="h6" sx={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>
+            Anonymous Feedback Board
+          </Typography>
+          <Chip
+            label="Preview"
+            size="small"
+            sx={{
+              bgcolor: alpha('#00C9FF', 0.1),
+              color: '#00C9FF',
+              border: '1px solid rgba(0,201,255,0.3)',
+              fontSize: '0.65rem',
+              height: 20,
+            }}
+          />
+        </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>{walletButton()}</Box>
-    </AppBar>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>{walletButton()}</Box>
+      </AppBar>
+
+      {/* Wallet picker dialog — shown when multiple wallets are detected */}
+      <WalletPickerDialog
+        open={status === 'picking'}
+        wallets={availableWallets}
+        onSelect={selectWallet}
+        onClose={() => {
+          // User dismissed — go back to disconnected
+          disconnect();
+        }}
+      />
+    </>
   );
 };

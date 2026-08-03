@@ -2,7 +2,7 @@
 // Copyright (C) Midnight Foundation
 // SPDX-License-Identifier: Apache-2.0
 // Licensed under the Apache License, Version 2.0 (the "License");
-// You may not use this file except in compliance with the License.
+// you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 // http://www.apache.org/licenses/LICENSE-2.0
@@ -24,7 +24,6 @@ import {
   BehaviorSubject,
   catchError,
   concatMap,
-  filter,
   firstValueFrom,
   interval,
   map,
@@ -40,7 +39,6 @@ import { ConnectedAPI, type InitialAPI } from '@midnight-ntwrk/dapp-connector-ap
 import { FetchZkConfigProvider } from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider';
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
-import semver from 'semver';
 import {
   Binding,
   FinalizedTransaction,
@@ -94,46 +92,22 @@ export type BoardDeployment = InProgressBoardDeployment | DeployedBoardDeploymen
  * Provides access to bulletin board deployments.
  */
 export interface DeployedBoardAPIProvider {
-  /**
-   * Gets the observable set of board deployments.
-   *
-   * @remarks
-   * This property represents an observable array of {@link BoardDeployment}, each also an
-   * observable. Changes to the array will be emitted as boards are resolved (deployed or joined),
-   * while changes to each underlying board can be observed via each item in the array.
-   */
   readonly boardDeployments$: Observable<Array<Observable<BoardDeployment>>>;
-
-  /**
-   * Joins or deploys a bulletin board contract.
-   *
-   * @param contractAddress An optional contract address to use when resolving.
-   * @returns An observable board deployment.
-   *
-   * @remarks
-   * For a given `contractAddress`, the method will attempt to find and join the identified bulletin board
-   * contract; otherwise it will attempt to deploy a new one.
-   */
   readonly resolve: (contractAddress?: ContractAddress) => Observable<BoardDeployment>;
 }
 
 /**
  * A {@link DeployedBoardAPIProvider} that manages bulletin board deployments in a browser setting.
- *
- * @remarks
- * {@link BrowserDeployedBoardManager} configures and manages a connection to the Midnight Lace
- * wallet, along with a collection of additional providers that work in a web-browser setting.
  */
 export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
   readonly #boardDeploymentsSubject: BehaviorSubject<Array<BehaviorSubject<BoardDeployment>>>;
   #initializedProviders: Promise<AnonFeedProviders> | undefined;
 
   /**
-   * Initializes a new {@link BrowserDeployedBoardManager} instance.
-   *
-   * @param logger The `pino` logger to for logging.
+   * @param logger The `pino` logger to use for logging.
+   * @param walletAPI The already-connected wallet to use — never re-discovers a wallet.
    */
-  constructor(private readonly logger: Logger) {
+  constructor(private readonly logger: Logger, private readonly walletAPI: InitialAPI) {
     this.#boardDeploymentsSubject = new BehaviorSubject<Array<BehaviorSubject<BoardDeployment>>>([]);
     this.boardDeployments$ = this.#boardDeploymentsSubject;
   }
@@ -153,9 +127,7 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
       return deployment;
     }
 
-    deployment = new BehaviorSubject<BoardDeployment>({
-      status: 'in-progress',
-    });
+    deployment = new BehaviorSubject<BoardDeployment>({ status: 'in-progress' });
 
     if (contractAddress) {
       void this.joinDeployment(deployment, contractAddress);
@@ -164,34 +136,20 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
     }
 
     this.#boardDeploymentsSubject.next([...deployments, deployment]);
-
     return deployment;
   }
 
   private getProviders(): Promise<AnonFeedProviders> {
-    // We use a cached `Promise` to hold the providers. This will:
-    //
-    // 1. Cache and re-use the providers (including the configured connector API), and
-    // 2. Act as a synchronization point if multiple contract deploys or joins run concurrently.
-    //    Concurrent calls to `getProviders()` will receive, and ultimately await, the same
-    //    `Promise`.
-    return this.#initializedProviders ?? (this.#initializedProviders = initializeProviders(this.logger));
+    return this.#initializedProviders ?? (this.#initializedProviders = initializeProviders(this.logger, this.walletAPI));
   }
 
   private async deployDeployment(deployment: BehaviorSubject<BoardDeployment>): Promise<void> {
     try {
       const providers = await this.getProviders();
       const api = await AnonFeedAPI.deploy(providers, this.logger);
-
-      deployment.next({
-        status: 'deployed',
-        api,
-      });
+      deployment.next({ status: 'deployed', api });
     } catch (error: unknown) {
-      deployment.next({
-        status: 'failed',
-        error: error instanceof Error ? error : new Error(String(error)),
-      });
+      deployment.next({ status: 'failed', error: error instanceof Error ? error : new Error(String(error)) });
     }
   }
 
@@ -202,25 +160,18 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
     try {
       const providers = await this.getProviders();
       const api = await AnonFeedAPI.join(providers, contractAddress, this.logger);
-
-      deployment.next({
-        status: 'deployed',
-        api,
-      });
+      deployment.next({ status: 'deployed', api });
     } catch (error: unknown) {
-      deployment.next({
-        status: 'failed',
-        error: error instanceof Error ? error : new Error(String(error)),
-      });
+      deployment.next({ status: 'failed', error: error instanceof Error ? error : new Error(String(error)) });
     }
   }
 }
 
 /** @internal */
-const initializeProviders = async (logger: Logger): Promise<AnonFeedProviders> => {
-  const networkId = (import.meta.env.VITE_NETWORK_ID ?? 'preprod') as NetworkId;
-  const connectedAPI = await connectToWallet(logger, networkId);
-  const zkConfigPath = window.location.origin; // '../../../contract/src/managed/anon-feed';
+const initializeProviders = async (logger: Logger, walletAPI: InitialAPI): Promise<AnonFeedProviders> => {
+  const networkId = (import.meta.env.VITE_NETWORK_ID ?? 'preview') as NetworkId;
+  const connectedAPI = await connectToWallet(logger, networkId, walletAPI);
+  const zkConfigPath = window.location.origin;
   const keyMaterialProvider = new FetchZkConfigProvider<AnonFeedCircuitKeys>(zkConfigPath, fetch.bind(window));
   const config = await connectedAPI.getConfiguration();
   const inMemoryAnonFeedPrivateStateProvider = inMemoryPrivateStateProvider<string, AnonFeedPrivateState>();
@@ -261,7 +212,7 @@ const initializeProviders = async (logger: Logger): Promise<AnonFeedProviders> =
       submitTx: async (tx: FinalizedTransaction): Promise<TransactionId> => {
         await connectedAPI.submitTransaction(toHex(tx.serialize()));
         const txIdentifiers = tx.identifiers();
-        const txId = txIdentifiers[0]; // Return the first transaction ID
+        const txId = txIdentifiers[0];
         logger.info({ txIdentifiers }, 'Submitted transaction via wallet');
         return txId;
       },
@@ -269,65 +220,15 @@ const initializeProviders = async (logger: Logger): Promise<AnonFeedProviders> =
   };
 };
 
-/** @internal */
-const getCompatibleWallets = (): InitialAPI[] => {
-  if (!window.midnight) return [];
-  return Object.values(window.midnight).filter(
-    (wallet): wallet is InitialAPI =>
-      !!wallet &&
-      typeof wallet === 'object' &&
-      'apiVersion' in wallet &&
-      semver.satisfies(wallet.apiVersion, COMPATIBLE_CONNECTOR_API_VERSION),
-  );
-};
-
-/** Prefer Lace (mnLace) if present, otherwise use first compatible wallet */
-const getPreferredWallet = (): InitialAPI | undefined => {
-  if (!window.midnight) return undefined;
-  const lace = (window.midnight as Record<string, unknown>)['mnLace'];
-  if (
-    lace &&
-    typeof lace === 'object' &&
-    'apiVersion' in lace &&
-    semver.satisfies((lace as InitialAPI).apiVersion, COMPATIBLE_CONNECTOR_API_VERSION)
-  ) {
-    return lace as InitialAPI;
-  }
-  return getCompatibleWallets()[0];
-};
-
-const COMPATIBLE_CONNECTOR_API_VERSION = '4.x';
-
-/** @internal */
-const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAPI> => {
+/** @internal — connects using the exact wallet the user already selected */
+const connectToWallet = (logger: Logger, networkId: string, walletAPI: InitialAPI): Promise<ConnectedAPI> => {
   return firstValueFrom(
     fnPipe(
       interval(100),
-      map(() => getPreferredWallet()),
-      tap((connectorAPI) => {
-        if (connectorAPI) logger.info({ name: connectorAPI.name, rdns: connectorAPI.rdns }, 'Check for wallet connector API');
-      }),
-      filter((connectorAPI): connectorAPI is InitialAPI => !!connectorAPI),
-      tap((connectorAPI) => {
-        logger.info({ name: connectorAPI.name, rdns: connectorAPI.rdns }, 'Compatible wallet connector API found. Connecting.');
-      }),
+      map(() => walletAPI),
+      tap((w) => logger.info({ name: w.name, rdns: w.rdns }, 'Using connected wallet for board operation')),
       take(1),
-      timeout({
-        first: 10_000,
-        with: () =>
-          throwError(() => {
-            const found = getCompatibleWallets();
-            const names = found.map((w) => w.name).join(', ');
-            logger.error('Could not find wallet connector API');
-            return new Error(
-              found.length > 0
-                ? `Found wallet(s) [${names}] but none on Midnight Preprod. Open your wallet → Settings → Networks and enable Midnight Preprod.`
-                : 'No Midnight wallet found. Install Lace (lace.io/midnight) or 1AM (1am.xyz) and enable Midnight Preprod network.',
-            );
-          }),
-      }),
       concatMap(async (initialAPI) => {
-        // Retry connect up to 30s to allow Lace wallet to finish syncing
         const deadline = Date.now() + 30_000;
         let lastError: unknown;
         while (Date.now() < deadline) {
@@ -335,25 +236,22 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
             const connectedAPI = await initialAPI.connect(networkId);
             const connectionStatus = await connectedAPI.getConnectionStatus();
             logger.info(connectionStatus, 'Wallet connection status');
-            // Hard-fail on disconnected or network mismatch — do NOT retry
             if (connectionStatus.status === 'disconnected') {
               throw new Error(
                 `Wallet "${initialAPI.name}" reported status "disconnected". Open the wallet and try again.`,
               );
             }
-            // status === 'connected': networkId is present on this branch per ConnectionStatus type
             if (connectionStatus.networkId !== networkId) {
               const walletNet = connectionStatus.networkId ?? 'an unknown network';
               throw new Error(
                 `Wallet "${initialAPI.name}" is on network "${walletNet}" but this app requires "${networkId}". ` +
-                  `Open ${initialAPI.name} → Settings → Networks and switch to Midnight Preprod.`,
+                  `Open ${initialAPI.name} → Settings → Networks and switch to Midnight Preview.`,
               );
             }
             return connectedAPI;
           } catch (e: unknown) {
             lastError = e;
             const msg = e instanceof Error ? e.message : String(e);
-            // Only retry on sync errors — rethrow everything else immediately
             if (msg.toLowerCase().includes('sync') || msg.toLowerCase().includes('not ready')) {
               logger.info('Wallet syncing — retrying in 2s...');
               await new Promise((r) => setTimeout(r, 2_000));
@@ -362,7 +260,7 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
             }
           }
         }
-        throw lastError ?? new Error('Wallet failed to sync within 30 seconds. Open the wallet and wait for sync to finish.');
+        throw lastError ?? new Error('Wallet failed to sync within 30 seconds.');
       }),
       timeout({
         first: 45_000,
@@ -372,7 +270,6 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
             return new Error('Wallet is taking too long to respond. Open the extension and wait for it to finish syncing.');
           }),
       }),
-      // Pass errors through as-is — do NOT wrap in a generic message
       catchError((error) => throwError(() => (error instanceof Error ? error : new Error(String(error))))),
     ),
   );

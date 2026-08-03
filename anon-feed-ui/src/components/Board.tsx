@@ -56,9 +56,9 @@ export const Board: React.FC<Readonly<BoardProps>> = ({ boardDeployment$ }) => {
   const [messagePrompt, setMessagePrompt] = useState<string>();
   const [isWorking, setIsWorking] = useState(!!boardDeployment$);
 
-  const onCreateBoard = useCallback(() => boardApiProvider.resolve(), [boardApiProvider]);
+  const onCreateBoard = useCallback(() => boardApiProvider?.resolve(), [boardApiProvider]);
   const onJoinBoard = useCallback(
-    (contractAddress: ContractAddress) => boardApiProvider.resolve(contractAddress),
+    (contractAddress: ContractAddress) => boardApiProvider?.resolve(contractAddress),
     [boardApiProvider],
   );
 

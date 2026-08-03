@@ -23,12 +23,6 @@ import { DeployedBoardContext, type DeployedBoardAPIProvider } from '../contexts
  *
  * @internal
  */
-export const useDeployedBoardContext = (): DeployedBoardAPIProvider => {
-  const context = useContext(DeployedBoardContext);
-
-  if (!context) {
-    throw new Error('A <DeployedBoardProvider /> is required.');
-  }
-
-  return context;
+export const useDeployedBoardContext = (): DeployedBoardAPIProvider | undefined => {
+  return useContext(DeployedBoardContext);
 };

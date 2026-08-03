@@ -16,11 +16,9 @@ A privacy-preserving feedback board built on the [Midnight Network](https://midn
 
 | Network | Contract Address |
 |---------|------------------|
-| Preprod | `<YOUR_DEPLOYED_CONTRACT_ADDRESS>` |
+| Preview | `8c29bde18fee927977130a6fda3f9f0e066b0537b1bc9ba3e46c3093ed929614` |
 
-**Status:** ⏳ Pending Deployment
-
-> After deploying, replace `<YOUR_DEPLOYED_CONTRACT_ADDRESS>` everywhere it appears in this project.
+**Status:** ✅ Deployed
 
 ---
 
@@ -265,7 +263,7 @@ No additional coding is required after this step.
 |----------|-------------|---------|
 | `VITE_NETWORK_ID` | Network identifier | `preprod` |
 | `VITE_LOGGING_LEVEL` | Log verbosity | `info` |
-| `VITE_CONTRACT_ADDRESS` | Deployed contract address | `<YOUR_DEPLOYED_CONTRACT_ADDRESS>` |
+| `VITE_CONTRACT_ADDRESS` | Deployed contract address | `8c29bde18fee927977130a6fda3f9f0e066b0537b1bc9ba3e46c3093ed929614` |
 | `VITE_PROOF_SERVER` | Proof server URL | `http://localhost:6300` |
 
 ### Network Endpoints (Preprod)

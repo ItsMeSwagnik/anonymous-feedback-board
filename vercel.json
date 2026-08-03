@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd anon-feed-ui && npm install && npx vite build --mode preprod -- --config vite.config.ts",
+  "buildCommand": "cd anon-feed-ui && npm install && npx vite build --mode preview && cp -r ../contract/src/managed/anon-feed/keys ./dist/keys && cp -r ../contract/src/managed/anon-feed/zkir ./dist/zkir",
   "outputDirectory": "anon-feed-ui/dist",
   "devCommand": "cd anon-feed-ui && npm run dev",
   "installCommand": "npm install && cd anon-feed-ui && npm install",
@@ -12,7 +12,7 @@
     }
   ],
   "env": {
-    "VITE_NETWORK_ID": "preprod",
+    "VITE_NETWORK_ID": "preview",
     "VITE_LOGGING_LEVEL": "info",
     "VITE_CONTRACT_ADDRESS": "placeholder"
   }

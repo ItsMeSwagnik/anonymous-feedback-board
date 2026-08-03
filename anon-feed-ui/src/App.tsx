@@ -34,11 +34,9 @@ const App: React.FC = () => {
   const [boardDeployments, setBoardDeployments] = useState<Array<Observable<BoardDeployment>>>([]);
 
   useEffect(() => {
+    if (!boardApiProvider) return;
     const subscription = boardApiProvider.boardDeployments$.subscribe(setBoardDeployments);
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => { subscription.unsubscribe(); };
   }, [boardApiProvider]);
 
   return (

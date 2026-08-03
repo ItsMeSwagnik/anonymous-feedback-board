@@ -16,26 +16,17 @@
 import React, { type PropsWithChildren, createContext } from 'react';
 import { type DeployedBoardAPIProvider, BrowserDeployedBoardManager } from './BrowserDeployedBoardManager';
 import { type Logger } from 'pino';
+import type { InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 
-/**
- * Encapsulates a deployed boards provider as a context object.
- */
 export const DeployedBoardContext = createContext<DeployedBoardAPIProvider | undefined>(undefined);
 
-/**
- * The props required by the {@link DeployedBoardProvider} component.
- */
 export type DeployedBoardProviderProps = PropsWithChildren<{
-  /** The `pino` logger to use. */
   logger: Logger;
+  walletAPI: InitialAPI;
 }>;
 
-/**
- * A React component that sets a new {@link BrowserDeployedBoardManager} object as the currently
- * in-scope deployed board provider.
- */
-export const DeployedBoardProvider: React.FC<Readonly<DeployedBoardProviderProps>> = ({ logger, children }) => (
-  <DeployedBoardContext.Provider value={new BrowserDeployedBoardManager(logger)}>
+export const DeployedBoardProvider: React.FC<Readonly<DeployedBoardProviderProps>> = ({ logger, walletAPI, children }) => (
+  <DeployedBoardContext.Provider value={new BrowserDeployedBoardManager(logger, walletAPI)}>
     {children}
   </DeployedBoardContext.Provider>
 );
