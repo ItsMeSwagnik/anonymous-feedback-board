@@ -206,7 +206,11 @@ export class AnonFeedAPI implements DeployedAnonFeedAPI {
    * @returns A `Promise` that resolves with a {@link AnonFeedAPI} instance that manages the joined
    * {@link DeployedAnonFeedContract}; or rejects with an error.
    */
-  static async join(providers: AnonFeedProviders, contractAddress: ContractAddress, logger?: Logger): Promise<AnonFeedAPI> {
+  static async join(
+    providers: AnonFeedProviders,
+    contractAddress: ContractAddress,
+    logger?: Logger,
+  ): Promise<AnonFeedAPI> {
     logger?.info({
       joinContract: {
         contractAddress,
