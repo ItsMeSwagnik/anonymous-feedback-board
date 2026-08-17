@@ -25,7 +25,11 @@ export type DeployedBoardProviderProps = PropsWithChildren<{
   walletAPI: InitialAPI;
 }>;
 
-export const DeployedBoardProvider: React.FC<Readonly<DeployedBoardProviderProps>> = ({ logger, walletAPI, children }) => (
+export const DeployedBoardProvider: React.FC<Readonly<DeployedBoardProviderProps>> = ({
+  logger,
+  walletAPI,
+  children,
+}) => (
   <DeployedBoardContext.Provider value={new BrowserDeployedBoardManager(logger, walletAPI)}>
     {children}
   </DeployedBoardContext.Provider>

@@ -35,7 +35,16 @@ export const Header: React.FC = () => {
     if (status === 'syncing') {
       return (
         <Chip
-          icon={<SyncIcon sx={{ fontSize: '1rem !important', color: '#00C9FF !important', animation: 'spin 1.5s linear infinite', '@keyframes spin': { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } } }} />}
+          icon={
+            <SyncIcon
+              sx={{
+                fontSize: '1rem !important',
+                color: '#00C9FF !important',
+                animation: 'spin 1.5s linear infinite',
+                '@keyframes spin': { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } },
+              }}
+            />
+          }
           label="Wallet syncing…"
           sx={{
             bgcolor: alpha('#00C9FF', 0.08),

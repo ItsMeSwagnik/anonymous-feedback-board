@@ -107,7 +107,10 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
    * @param logger The `pino` logger to use for logging.
    * @param walletAPI The already-connected wallet to use — never re-discovers a wallet.
    */
-  constructor(private readonly logger: Logger, private readonly walletAPI: InitialAPI) {
+  constructor(
+    private readonly logger: Logger,
+    private readonly walletAPI: InitialAPI,
+  ) {
     this.#boardDeploymentsSubject = new BehaviorSubject<Array<BehaviorSubject<BoardDeployment>>>([]);
     this.boardDeployments$ = this.#boardDeploymentsSubject;
   }
@@ -140,7 +143,9 @@ export class BrowserDeployedBoardManager implements DeployedBoardAPIProvider {
   }
 
   private getProviders(): Promise<AnonFeedProviders> {
-    return this.#initializedProviders ?? (this.#initializedProviders = initializeProviders(this.logger, this.walletAPI));
+    return (
+      this.#initializedProviders ?? (this.#initializedProviders = initializeProviders(this.logger, this.walletAPI))
+    );
   }
 
   private async deployDeployment(deployment: BehaviorSubject<BoardDeployment>): Promise<void> {
@@ -267,7 +272,9 @@ const connectToWallet = (logger: Logger, networkId: string, walletAPI: InitialAP
         with: () =>
           throwError(() => {
             logger.error('Wallet connector API has failed to respond');
-            return new Error('Wallet is taking too long to respond. Open the extension and wait for it to finish syncing.');
+            return new Error(
+              'Wallet is taking too long to respond. Open the extension and wait for it to finish syncing.',
+            );
           }),
       }),
       catchError((error) => throwError(() => (error instanceof Error ? error : new Error(String(error))))),

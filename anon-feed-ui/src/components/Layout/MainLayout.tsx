@@ -29,7 +29,8 @@ export const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'radial-gradient(ellipse at 20% 50%, rgba(0,201,255,0.05) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(146,254,157,0.04) 0%, transparent 50%), #0a0a0f',
+        background:
+          'radial-gradient(ellipse at 20% 50%, rgba(0,201,255,0.05) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(146,254,157,0.04) 0%, transparent 50%), #0a0a0f',
       }}
     >
       <Header />
@@ -64,7 +65,8 @@ export const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
           Anonymous Feedback Board
         </Typography>
         <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.55)', maxWidth: 480, mx: 'auto', mb: 3 }}>
-          Post messages anonymously on the Midnight Network. Only you can remove what you post — proven by zero-knowledge proofs.
+          Post messages anonymously on the Midnight Network. Only you can remove what you post — proven by
+          zero-knowledge proofs.
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1.5, flexWrap: 'wrap' }}>
           {privacyItems.map((item) => (
@@ -116,8 +118,10 @@ export const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       >
         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)' }}>
           Built on{' '}
-          <Box component="span" sx={{ color: 'rgba(0,201,255,0.6)' }}>Midnight Network</Box>
-          {' '}· Privacy-preserving by design
+          <Box component="span" sx={{ color: 'rgba(0,201,255,0.6)' }}>
+            Midnight Network
+          </Box>{' '}
+          · Privacy-preserving by design
         </Typography>
       </Box>
     </Box>

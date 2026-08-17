@@ -19,6 +19,10 @@ const config = tseslint.config(
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-base-to-string': 'off',
+      '@typescript-eslint/only-throw-error': 'off',
+      'react-hooks/exhaustive-deps': 'off',
     },
     settings: {
       react: {

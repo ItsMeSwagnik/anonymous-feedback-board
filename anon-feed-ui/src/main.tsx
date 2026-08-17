@@ -31,7 +31,6 @@ import { theme } from './config/theme';
 import '@midnight-ntwrk/dapp-connector-api';
 import * as pino from 'pino';
 import { DeployedBoardProvider, WalletProvider, useWallet } from './contexts';
-import type { InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 
 const networkId = import.meta.env.VITE_NETWORK_ID as NetworkId;
 setNetworkId(networkId);

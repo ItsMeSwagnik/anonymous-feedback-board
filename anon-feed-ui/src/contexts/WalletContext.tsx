@@ -1,5 +1,10 @@
 import React, {
-  createContext, useCallback, useContext, useEffect, useRef, useState,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
   type PropsWithChildren,
 } from 'react';
 import semver from 'semver';
@@ -74,10 +79,18 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
         const { address: a, walletName: n } = JSON.parse(saved) as { address: string; walletName: string };
-        if (a && n) { setAddress(a); setWalletName(n); setStatus('connected'); }
+        if (a && n) {
+          setAddress(a);
+          setWalletName(n);
+          setStatus('connected');
+        }
       }
-    } catch { /* ignore */ }
-    return () => { if (retryTimer.current) clearTimeout(retryTimer.current); };
+    } catch {
+      /* ignore */
+    }
+    return () => {
+      if (retryTimer.current) clearTimeout(retryTimer.current);
+    };
   }, []);
 
   // connect() — called synchronously in click handler (required by wallet popup rules)
@@ -88,7 +101,7 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
     if (wallets.length === 0) {
       setError(
         'No Midnight wallet found. Install Lace (lace.io/midnight) or 1AM (1am.xyz), ' +
-        'enable Midnight Preview inside the extension, then reload this page.',
+          'enable Midnight Preview inside the extension, then reload this page.',
       );
       setStatus('error');
       return;
@@ -118,7 +131,8 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
     retryWallet.current = wallet;
 
     // wallet.connect() MUST be called synchronously in the user-gesture path
-    wallet.connect(NETWORK_ID)
+    wallet
+      .connect(NETWORK_ID)
       .then(async (api) => {
         setStatus('syncing');
 
@@ -140,10 +154,13 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
       })
       .catch((e: unknown) => {
         console.warn('[WalletContext] connect error:', e);
-        const isAPIError = !!e && typeof e === 'object' && (e as Record<string, unknown>).type === 'DAppConnectorAPIError';
+        const isAPIError =
+          !!e && typeof e === 'object' && (e as Record<string, unknown>).type === 'DAppConnectorAPIError';
         const msg = isAPIError
           ? String((e as Record<string, unknown>).reason ?? (e as Record<string, unknown>).code ?? 'Wallet error')
-          : e instanceof Error ? e.message : String(e);
+          : e instanceof Error
+            ? e.message
+            : String(e);
         const lower = msg.toLowerCase();
 
         if (lower.includes('sync') || lower.includes('not ready') || lower.includes('loading')) {
@@ -156,7 +173,12 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
         // Wallet is locked or rejected — Lace throws Rejected when locked (no auto-unlock popup)
         const apiCode = isAPIError ? String((e as Record<string, unknown>).code ?? '') : '';
-        if (apiCode === 'Rejected' || lower.includes('lock') || lower.includes('unauthorized') || lower.includes('user rejected')) {
+        if (
+          apiCode === 'Rejected' ||
+          lower.includes('lock') ||
+          lower.includes('unauthorized') ||
+          lower.includes('user rejected')
+        ) {
           setError(
             `${wallet.name ?? 'Wallet'} is locked. Click the extension icon in your browser toolbar to unlock it, then click "Connect Wallet" again.`,
           );
@@ -182,10 +204,19 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   return (
-    <WalletContext.Provider value={{
-      status, address, walletName, error, availableWallets, connectedWallet,
-      connect, selectWallet, disconnect,
-    }}>
+    <WalletContext.Provider
+      value={{
+        status,
+        address,
+        walletName,
+        error,
+        availableWallets,
+        connectedWallet,
+        connect,
+        selectWallet,
+        disconnect,
+      }}
+    >
       {children}
     </WalletContext.Provider>
   );

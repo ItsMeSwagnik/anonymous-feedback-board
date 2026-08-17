@@ -1,7 +1,17 @@
 import React from 'react';
 import {
-  Dialog, DialogTitle, DialogContent, List, ListItemButton,
-  ListItemAvatar, ListItemText, Avatar, Typography, Box, alpha, IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  List,
+  ListItemButton,
+  ListItemAvatar,
+  ListItemText,
+  Avatar,
+  Typography,
+  Box,
+  alpha,
+  IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -14,9 +24,7 @@ interface WalletPickerDialogProps {
   onClose: () => void;
 }
 
-export const WalletPickerDialog: React.FC<WalletPickerDialogProps> = ({
-  open, wallets, onSelect, onClose,
-}) => (
+export const WalletPickerDialog: React.FC<WalletPickerDialogProps> = ({ open, wallets, onSelect, onClose }) => (
   <Dialog
     open={open}
     onClose={onClose}
@@ -32,9 +40,7 @@ export const WalletPickerDialog: React.FC<WalletPickerDialogProps> = ({
     }}
   >
     <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
-      <span style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>
-        Select Wallet
-      </span>
+      <span style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>Select Wallet</span>
       <IconButton size="small" onClick={onClose} sx={{ color: 'rgba(255,255,255,0.4)' }}>
         <CloseIcon fontSize="small" />
       </IconButton>
@@ -65,9 +71,7 @@ export const WalletPickerDialog: React.FC<WalletPickerDialogProps> = ({
               }}
             >
               <ListItemAvatar>
-                <Avatar
-                  sx={{ bgcolor: alpha('#00C9FF', 0.1), width: 40, height: 40 }}
-                >
+                <Avatar sx={{ bgcolor: alpha('#00C9FF', 0.1), width: 40, height: 40 }}>
                   {/* Render icon via <img> per docs — never innerHTML (XSS) */}
                   {w.icon ? (
                     <img src={w.icon} alt="" width={28} height={28} style={{ borderRadius: 4 }} />
