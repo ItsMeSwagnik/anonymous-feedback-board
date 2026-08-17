@@ -23,7 +23,10 @@ import * as Witnesses from "./witnesses";
 
 export const CompiledAnonFeedContractContract = CompiledContract.make<
   CompiledAnonFeedContract.Contract<Witnesses.AnonFeedPrivateState>
->("AnonFeed", CompiledAnonFeedContract.Contract<Witnesses.AnonFeedPrivateState>).pipe(
+>(
+  "AnonFeed",
+  CompiledAnonFeedContract.Contract<Witnesses.AnonFeedPrivateState>,
+).pipe(
   CompiledContract.withWitnesses(Witnesses.witnesses),
   CompiledContract.withCompiledFileAssets("./managed/anon-feed"),
 );
