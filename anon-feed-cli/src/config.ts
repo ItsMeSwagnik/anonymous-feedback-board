@@ -52,7 +52,13 @@ export class PreviewRemoteConfig implements Config {
     return new PreviewTestEnvironment(logger);
   }
   privateStateStoreName = 'anon-feed-private-state';
-  logDir = path.resolve(currentDir, '..', 'logs', 'preview-remote', `${new Date().toISOString().replace(/:/g, '-')}.log`);
+  logDir = path.resolve(
+    currentDir,
+    '..',
+    'logs',
+    'preview-remote',
+    `${new Date().toISOString().replace(/:/g, '-')}.log`,
+  );
   zkConfigPath = path.resolve(currentDir, '..', '..', 'contract', 'src', 'managed', 'anon-feed');
   generateDust = true;
 }

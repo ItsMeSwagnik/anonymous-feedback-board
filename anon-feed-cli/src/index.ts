@@ -87,7 +87,11 @@ You can do one of the following:
   3. Exit
 Which would you like to do? `;
 
-const deployOrJoin = async (providers: AnonFeedProviders, rli: Interface, logger: Logger): Promise<AnonFeedAPI | null> => {
+const deployOrJoin = async (
+  providers: AnonFeedProviders,
+  rli: Interface,
+  logger: Logger,
+): Promise<AnonFeedAPI | null> => {
   let api: AnonFeedAPI | null = null;
 
   while (true) {

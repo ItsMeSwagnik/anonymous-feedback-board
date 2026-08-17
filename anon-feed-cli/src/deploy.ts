@@ -12,8 +12,6 @@
  */
 
 import { WebSocket } from 'ws';
-import { createInterface } from 'node:readline/promises';
-import { stdin as input, stdout as output } from 'node:process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -58,7 +56,13 @@ function replaceInFile(filePath: string, address: string) {
 async function main() {
   const config = new PreprodRemoteConfig();
   // Override logDir to avoid Windows path double-drive-letter bug with import.meta.url
-  const logDir = path.join(__dirname, '..', 'logs', 'preprod-remote', `${new Date().toISOString().replace(/:/g, '-')}.log`);
+  const logDir = path.join(
+    __dirname,
+    '..',
+    'logs',
+    'preprod-remote',
+    `${new Date().toISOString().replace(/:/g, '-')}.log`,
+  );
   const logger = await createLogger(logDir);
   const testEnv = config.getEnvironment(logger);
 
