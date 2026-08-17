@@ -11,9 +11,6 @@ A privacy-preserving feedback board built on the [Midnight Network](https://midn
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)](https://shields.io/)
 [![Network](https://img.shields.io/badge/Network-Preview-orange.svg)](https://shields.io/)
 
-
-> A privacy-preserving feedback board built on the [Midnight Network](https://midnight.network/) where users can post anonymous messages that only they can remove — proven by zero-knowledge proofs.
-
 ---
 
 ## Live Demo
