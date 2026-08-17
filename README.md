@@ -128,37 +128,74 @@ An observer watching the Midnight blockchain can see *that* a message was posted
 
 ```
 anon-feed/
+├── .github/
+│   ├── ISSUE_TEMPLATE/          # Bug report, feature request, docs templates
+│   ├── PULL_REQUEST_TEMPLATE/
+│   ├── workflows/
+│   │   ├── ci.yaml              # CI pipeline (compile + test + build)
+│   │   └── scan.yaml            # Security scan workflow
+│   └── dependabot.yml
 ├── contract/                    # Compact smart contract
 │   └── src/
 │       ├── anon-feed.compact    # Main contract source
 │       ├── index.ts             # TypeScript exports
 │       ├── witnesses.ts         # Witness function implementations
-│       └── managed/             # Compiled contract output (generated)
-│           └── anon-feed/
+│       ├── managed/             # Compiled contract output (generated)
+│       │   └── anon-feed/
+│       │       ├── compiler/
+│       │       ├── contract/
+│       │       ├── keys/
+│       │       └── zkir/
+│       └── test/
+│           ├── bboard.test.ts   # 9 contract tests
+│           ├── bboard-simulator.ts
+│           └── utils.ts
 ├── api/                         # Shared API types and utilities
 │   └── src/
 │       ├── index.ts             # AnonFeedAPI class + exports
 │       ├── common-types.ts      # Shared type definitions
-│       └── utils/               # Utility functions (randomBytes, etc.)
+│       └── utils/
+│           └── index.ts
 ├── anon-feed-cli/               # Command-line interface
 │   └── src/
+│       ├── launcher/            # Network-specific entry points
+│       │   ├── preprod.ts
+│       │   ├── preview.ts
+│       │   └── standalone.ts
+│       ├── config.ts            # Network configuration
+│       ├── deploy.ts
 │       ├── index.ts             # CLI main logic
-│       ├── config.ts            # Network configuration (preprod/preview/standalone)
-│       └── launcher/            # Network-specific entry points
-│           ├── preprod.ts
-│           ├── preview.ts
-│           └── standalone.ts
+│       ├── logger-utils.ts
+│       ├── midnight-wallet-provider.ts
+│       └── wallet-utils.ts
 ├── anon-feed-ui/                # Web browser interface
+│   ├── public/
+│   │   ├── keys/                # ZK prover/verifier keys
+│   │   └── zkir/                # ZK IR files
 │   └── src/
+│       ├── components/
+│       │   ├── Layout/          # Header, MainLayout
+│       │   ├── Board.tsx
+│       │   ├── Board.EmptyCardContent.tsx
+│       │   ├── TextPromptDialog.tsx
+│       │   └── WalletPickerDialog.tsx
+│       ├── config/
+│       │   └── theme.ts
+│       ├── contexts/
+│       │   ├── WalletContext.tsx
+│       │   ├── DeployedBoardContext.tsx
+│       │   └── BrowserDeployedBoardManager.ts
+│       ├── hooks/
+│       │   └── useDeployedBoardContext.ts
 │       ├── App.tsx              # Root React component
 │       ├── main.tsx             # Entry point + provider setup
-│       ├── components/          # Board, Header, Layout, dialogs
-│       ├── contexts/            # WalletContext, DeployedBoardContext, BrowserDeployedBoardManager
-│       └── hooks/               # useDeployedBoardContext
-├── screenshots/                 # UI screenshots for README
+│       ├── globals.ts
+│       └── in-memory-private-state-provider.ts
 ├── vercel.json                  # Vercel deployment configuration
-├── README.md                    # This file
-└── QUICKSTART.md                # Quick setup guide
+├── PROPOSAL.md
+├── QUICKSTART.md
+├── README.md
+└── package.json                 # Workspace root
 ```
 
 ---
@@ -389,24 +426,6 @@ Or run in dev mode:
 cd anon-feed-ui
 npm run dev
 ```
-
----
-
-## Screenshots
-
-### Main Interface
-![Main Interface](./screenshots/ui-main.png)
-
-### Posting a Message
-![Post Message](./screenshots/ui-post.png)
-
-### Wallet Connection
-![Wallet Connection](./screenshots/ui-wallet.png)
-
-### Message View
-![View Message](./screenshots/ui-view.png)
-
-> Add screenshots to the `screenshots/` folder after running the application.
 
 ---
 
