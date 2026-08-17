@@ -116,14 +116,14 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
     // Multiple wallets — show picker
     setAvailableWallets(wallets);
     setStatus('picking');
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // selectWallet() — called when user picks from the dialog
   const selectWallet = useCallback((wallet: InitialAPI) => {
     setStatus('connecting');
     setAvailableWallets([]);
     doConnect(wallet);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const doConnect = (wallet: InitialAPI) => {
     setStatus('connecting');
