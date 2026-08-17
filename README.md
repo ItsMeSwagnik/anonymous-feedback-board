@@ -1,12 +1,19 @@
 # Anonymous Feedback Board
 
-<img width="1917" height="1027" alt="image" src="https://github.com/user-attachments/assets/197fd710-7397-4505-b48a-98ebac233b75" />
-
-A privacy-preserving feedback board built on the [Midnight Network](https://midnight.network/) where users can post anonymous messages that only they can remove — proven by zero-knowledge proofs.
-
+[![CI](https://github.com/ItsMeSwagnik/anonymous-feedback-board/actions/workflows/ci.yaml/badge.svg)](https://github.com/ItsMeSwagnik/anonymous-feedback-board/actions/workflows/ci.yaml)
 [![Compact Compiler](https://img.shields.io/badge/Compact%20Compiler-0.31.0-1abc9c.svg)](https://shields.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)](https://shields.io/)
-[![Network](https://img.shields.io/badge/Network-Preprod-orange.svg)](https://shields.io/)
+[![Network](https://img.shields.io/badge/Network-Preview-orange.svg)](https://shields.io/)
+
+<img width="1917" height="1027" alt="image" src="https://github.com/user-attachments/assets/197fd710-7397-4505-b48a-98ebac233b75" />
+
+> A privacy-preserving feedback board built on the [Midnight Network](https://midnight.network/) where users can post anonymous messages that only they can remove — proven by zero-knowledge proofs.
+
+---
+
+## Live Demo
+
+[https://anonymous-feedback-board.vercel.app/](https://anonymous-feedback-board.vercel.app/)
 
 ---
 
@@ -84,6 +91,17 @@ An observer watching the Midnight blockchain can see *that* a message was posted
 
 ---
 
+## Privacy Claim
+
+| What an observer sees | What an observer cannot see |
+|-----------------------|-----------------------------|
+| Board is `VACANT` or `OCCUPIED` | Who posted the message |
+| The message text | The poster's secret key |
+| The owner hash (derived from secret key) | The poster's wallet address |
+| Sequence number (total posts) | Any link between wallet and message |
+
+---
+
 ## Tech Stack
 
 | Component | Technology |
@@ -144,11 +162,11 @@ anon-feed/
 - Node.js v22+ (v24.11.1 recommended)
 - Docker Desktop (for proof server)
 - Lace wallet ([lace.io/midnight](https://www.lace.io/midnight)) or 1AM wallet ([1am.xyz](https://1am.xyz)) browser extension
-- Wallet configured for **Midnight Preprod** network
+- Wallet configured for **Midnight Preview** network
 
 ---
 
-## Installation
+## Setup & Run Locally
 
 ```bash
 # Clone the repository
@@ -157,7 +175,47 @@ cd anonymous-feedback-board
 
 # Install all workspace dependencies
 npm install
+
+# Start the proof server (Docker required)
+cd anon-feed-cli
+docker compose -f proof-server-local.yml up -d
+cd ..
+
+# Run the web UI in dev mode
+cd anon-feed-ui
+npm run dev
+# Access at http://127.0.0.1:5173
 ```
+
+---
+
+## Run Tests
+
+```bash
+cd contract
+npm test
+```
+
+The test suite covers circuit logic, state transitions, ownership enforcement, and privacy guarantees (9 tests total).
+
+---
+
+## CI/CD
+
+The pipeline (`.github/workflows/ci.yaml`) runs on every push to `main` and on every pull request. It:
+
+1. Checks out the code
+2. Installs the Compact compiler via `midnightntwrk/setup-compact-action`
+3. Installs Node.js v24
+4. Runs `npm ci` for all workspace packages
+5. Compiles the Compact contract and runs the full test suite
+6. Builds the API, CLI, and UI
+
+---
+
+## Product Proposal
+
+See [PROPOSAL.md](./PROPOSAL.md)
 
 ---
 
@@ -170,7 +228,7 @@ cd api && npm run build && cd ..
 # Build CLI
 cd anon-feed-cli && npm run build && cd ..
 
-# Build UI (targets preprod by default)
+# Build UI (targets preview by default)
 cd anon-feed-ui && npm run build && cd ..
 ```
 
@@ -217,14 +275,14 @@ docker compose -f proof-server-local.yml up -d
 
 ```bash
 cd anon-feed-cli
-npm run preprod-remote
+npm run preview-remote
 ```
 
 Follow the CLI prompts:
 
 1. Choose `1` — Build a fresh wallet
 2. Save the wallet seed and unshielded address
-3. Fund the wallet from the [Preprod Faucet](https://midnight-tmnight-preprod.nethermind.dev/)
+3. Fund the wallet from the [Preview Faucet](https://faucet.preview.midnight.network/)
 4. Wait 2–3 minutes for funds to arrive
 5. Choose to deploy a new contract
 6. **Copy the deployed contract address**
@@ -232,7 +290,7 @@ Follow the CLI prompts:
 ### Step 3 — Run the deployment command
 
 ```bash
-NODE_OPTIONS="--max-old-space-size=12288" npm run preprod-remote
+NODE_OPTIONS="--max-old-space-size=12288" npm run preview-remote
 ```
 
 ---
@@ -249,7 +307,7 @@ In these files:
 
 1. `README.md` — Contract Address table
 2. `anon-feed-ui/.env` — `VITE_CONTRACT_ADDRESS`
-3. `anon-feed-ui/.env.preprod` — `VITE_CONTRACT_ADDRESS`
+3. `anon-feed-ui/.env.preview` — `VITE_CONTRACT_ADDRESS`
 
 No additional coding is required after this step.
 
@@ -261,35 +319,35 @@ No additional coding is required after this step.
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `VITE_NETWORK_ID` | Network identifier | `preprod` |
+| `VITE_NETWORK_ID` | Network identifier | `preview` |
 | `VITE_LOGGING_LEVEL` | Log verbosity | `info` |
 | `VITE_CONTRACT_ADDRESS` | Deployed contract address | `8c29bde18fee927977130a6fda3f9f0e066b0537b1bc9ba3e46c3093ed929614` |
 | `VITE_PROOF_SERVER` | Proof server URL | `http://localhost:6300` |
 
-### Network Endpoints (Preprod)
+### Network Endpoints (Preview)
 
 | Service | URL |
 |---------|-----|
-| Node RPC | `https://rpc.preprod.midnight.network` |
-| Indexer (GraphQL) | `https://indexer.preprod.midnight.network/api/v4/graphql` |
-| Indexer (WebSocket) | `wss://indexer.preprod.midnight.network/api/v4/graphql/ws` |
-| Faucet UI | `https://midnight-tmnight-preprod.nethermind.dev/` |
-| Block Explorer | `https://preprod.midnightexplorer.com/` |
+| Node RPC | `https://rpc.preview.midnight.network` |
+| Indexer (GraphQL) | `https://indexer.preview.midnight.network/api/v4/graphql` |
+| Indexer (WebSocket) | `wss://indexer.preview.midnight.network/api/v4/graphql/ws` |
+| Faucet UI | `https://faucet.preview.midnight.network/` |
+| Block Explorer | `https://preview.midnightexplorer.com/` |
 
 ---
 
 ## Network Verification
 
-This app targets **Midnight Preprod** (`networkId = 'preprod'`).
+This app targets **Midnight Preview** (`networkId = 'preview'`).
 
 Verified in:
-- `anon-feed-ui/.env` → `VITE_NETWORK_ID=preprod`
+- `anon-feed-ui/.env` → `VITE_NETWORK_ID=preview`
 - `anon-feed-ui/src/main.tsx` → `setNetworkId(networkId)` called at startup
-- `anon-feed-cli/src/config.ts` → `PreprodRemoteConfig` calls `setNetworkId('preprod')`
-- `WalletContext.tsx` → validates `connectionStatus.networkId === 'preprod'` on connect
+- `anon-feed-cli/src/config.ts` → `PreviewRemoteConfig` calls `setNetworkId('preview')`
+- `WalletContext.tsx` → validates `connectionStatus.networkId === 'preview'` on connect
 
 If your wallet is on a different network (e.g. mainnet), the app will show:
-> "YourWallet" is connected to "mainnet" but this app requires "preprod". Open YourWallet → Settings → Networks and switch to Midnight Preprod.
+> "YourWallet" is connected to "mainnet" but this app requires "preview". Open YourWallet → Settings → Networks and switch to Midnight Preview.
 
 ---
 
@@ -299,7 +357,7 @@ If your wallet is on a different network (e.g. mainnet), the app will show:
 
 ```bash
 cd anon-feed-cli
-npm run preprod-remote
+npm run preview-remote
 ```
 
 Menu options:
@@ -346,15 +404,9 @@ npm run dev
 
 ---
 
-## Live Demo Link (Vercel):
-https://anonymous-feedback-board.vercel.app/
+## Google Drive Demo Link
 
-## Google Drive Demo Link:
 https://drive.google.com/file/d/1GIR1S8MqbnT7zgzl-htBji1s24H7cqN5/view?usp=sharing
-
-## Initial Idea
-
-> _Fill in your initial idea and motivation here before submitting on Rise In._
 
 ---
 
@@ -362,12 +414,13 @@ https://drive.google.com/file/d/1GIR1S8MqbnT7zgzl-htBji1s24H7cqN5/view?usp=shari
 
 | Issue | Solution |
 |-------|----------|
-| `"undefined"` in network mismatch error | Wallet is on a non-Midnight network (e.g. mainnet). Switch to Midnight Preprod in wallet settings. |
-| Wallet not found | Install Lace ([lace.io/midnight](https://www.lace.io/midnight)) or 1AM ([1am.xyz](https://1am.xyz)), enable Midnight Preprod, reload page |
+| Network mismatch error | Wallet is on a non-Midnight network. Switch to Midnight Preview in wallet settings. |
+| Wallet not found | Install Lace ([lace.io/midnight](https://www.lace.io/midnight)) or 1AM ([1am.xyz](https://1am.xyz)), enable Midnight Preview, reload page |
+| Wallet is locked | Unlock the extension manually, then click Connect Wallet again |
 | "Wallet is syncing" | Open the wallet extension, wait for sync indicator to clear, click Connect Wallet again (auto-retries 30s) |
 | Proof server unreachable | Run `docker compose -f proof-server-local.yml up -d` in `anon-feed-cli/` |
 | Contract compilation fails | Ensure Docker is running and you have access to `ghcr.io` |
-| No funds in wallet | Request tNIGHT from [Preprod Faucet](https://midnight-tmnight-preprod.nethermind.dev/) |
+| No funds in wallet | Request tNIGHT from [Preview Faucet](https://faucet.preview.midnight.network/) |
 | Vercel deployment fails | Check `vercel.json` and build logs; ensure `VITE_CONTRACT_ADDRESS` is set |
 | Address lost on refresh | Fixed — wallet address is persisted in `sessionStorage` after successful connection |
 
@@ -378,8 +431,8 @@ https://drive.google.com/file/d/1GIR1S8MqbnT7zgzl-htBji1s24H7cqN5/view?usp=shari
 - [Midnight Documentation](https://docs.midnight.network/)
 - [Compact Language Guide](https://docs.midnight.network/compact/writing)
 - [DApp Connector API](https://docs.midnight.network/api-reference/dapp-connector)
-- [Preprod Faucet](https://midnight-tmnight-preprod.nethermind.dev/)
-- [Preprod Explorer](https://preprod.midnightexplorer.com/)
+- [Preview Faucet](https://faucet.preview.midnight.network/)
+- [Preview Explorer](https://preview.midnightexplorer.com/)
 - [Lace Wallet](https://www.lace.io/midnight)
 - [1AM Wallet](https://1am.xyz)
 - [Builder Resources](https://pool-morocco-ae1.notion.site/Midnight-Builder-Resources-306087eb373e809c89fbd7f61a5b4d17)
