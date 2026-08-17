@@ -230,6 +230,8 @@ npm run dev
 
 ## Run Tests
 
+<img width="1097" height="566" alt="image" src="https://github.com/user-attachments/assets/3cc5020b-ea50-4ee5-acc4-16407a7b14de" />
+
 ```bash
 cd contract
 npm test
@@ -240,8 +242,6 @@ The test suite covers circuit logic, state transitions, ownership enforcement, a
 ---
 
 ## CI/CD
-
-<img width="1097" height="566" alt="image" src="https://github.com/user-attachments/assets/3cc5020b-ea50-4ee5-acc4-16407a7b14de" />
 
 The pipeline (`.github/workflows/ci.yaml`) runs on every push to `main` and on every pull request. It:
 
